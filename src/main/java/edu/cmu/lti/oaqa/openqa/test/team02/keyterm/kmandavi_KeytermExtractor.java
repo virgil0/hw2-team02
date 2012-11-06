@@ -13,7 +13,7 @@ import org.apache.uima.resource.ResourceInitializationException;
 import edu.cmu.lti.oaqa.cse.basephase.keyterm.AbstractKeytermExtractor;
 import edu.cmu.lti.oaqa.framework.data.Keyterm;
 
-public class GeneKeytermExtractor extends AbstractKeytermExtractor {
+public class kmandavi_KeytermExtractor extends AbstractKeytermExtractor {
 
   @Override
   protected List<Keyterm> getKeyterms(String question) {
