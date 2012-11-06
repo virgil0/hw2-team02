@@ -70,5 +70,10 @@
 			<artifactId>helloqa</artifactId>
 			<version>1.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>edu.cmu.lti.11791.f12.hw1</groupId>
+			<artifactId>hw1-kmandavi</artifactId>
+			<version>0.0.3-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 </project>
