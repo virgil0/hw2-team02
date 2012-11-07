@@ -5,7 +5,7 @@
 	<groupId>edu.cmu.lti.11791.f12.hw2</groupId>
 	<artifactId>hw2-team02</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	 <scm>
+	<scm>
         <connection>
 			scm:git:git@github.com:virgil0/hw2-team02.git
         </connection>
@@ -69,6 +69,11 @@
 			<groupId>edu.cmu.lti.oaqa.openqa</groupId>
 			<artifactId>helloqa</artifactId>
 			<version>1.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.aliasi</groupId>
+			<artifactId>lingpipe</artifactId>
+			<version>4.1.0</version>
 		</dependency>
 	</dependencies>
 </project>
