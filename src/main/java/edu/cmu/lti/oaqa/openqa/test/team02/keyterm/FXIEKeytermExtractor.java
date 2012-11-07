@@ -19,7 +19,7 @@ import edu.cmu.lti.oaqa.framework.data.Keyterm;
 
 /**
  *
- * @author Yucong Yang
+ * @author Fei Xie
  */
 public class FXIEKeytermExtractor extends AbstractKeytermExtractor {
 
