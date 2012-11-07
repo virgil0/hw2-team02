@@ -1,5 +1,0 @@
-class: edu.cmu.lti.oaqa.openqa.test.team02.YucongyKeytermExtractor
-model_file: src/main/resources/model/ne-en-bio-genetag.HmmChunker
-
-persistence-provider: |
-  inherit: ecd.default-log-persistence-provider

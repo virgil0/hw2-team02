@@ -15,8 +15,9 @@ pipeline:
     name: keyterm-extractor
     options: |
       - inherit: helloqa.keyterm.simple
-      - inherit: hellobioqa.team02.keyterm.kmandavi
-      - inherit: hellobioqa.team02.keyterm.yucongy-keyterm-extractor
+      - inherit: hellobioqa.team02.keyterm.kmandavi-hw1
+      - inherit: hellobioqa.team02.keyterm.yucongy-hw1
+      - inherit: hellobioqa.team02.keyterm.fxie-hw1
 
   - inherit: jdbc.sqlite.cse.phase 
     name: retrieval-strategist
@@ -49,4 +50,5 @@ post-process:
   - inherit: report.csv-report-generator
     builders: |
       - inherit: helloqa.report.map-report-component
+  
   
