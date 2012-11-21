@@ -81,6 +81,11 @@
 			<artifactId>hw1-kmandavi</artifactId>
 			<version>0.0.3</version>
 		</dependency>
+		<dependency>
+			<groupId>maven</groupId>
+			<artifactId>dom4j</artifactId>
+			<version>1.7-20060614</version>
+		</dependency>
 	</dependencies>
 </project>
 
