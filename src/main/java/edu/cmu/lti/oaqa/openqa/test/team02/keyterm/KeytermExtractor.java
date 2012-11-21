@@ -16,11 +16,7 @@ import com.aliasi.util.AbstractExternalizable;
 import edu.cmu.lti.oaqa.cse.basephase.keyterm.AbstractKeytermExtractor;
 import edu.cmu.lti.oaqa.framework.data.Keyterm;
 
-/**
- *
- * @author Yucong Yang
- */
-public class YucongyKeytermExtractor extends AbstractKeytermExtractor {
+public class KeytermExtractor extends AbstractKeytermExtractor {
 
   public static final String PARAM_MODELFILE = "model_file";
 

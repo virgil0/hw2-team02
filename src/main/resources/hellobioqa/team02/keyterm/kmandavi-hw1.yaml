@@ -1,4 +1,0 @@
-class: edu.cmu.lti.oaqa.openqa.test.team02.keyterm.KmandaviKeytermExtractor
-
-persistence-provider: |
-  inherit: ecd.default-log-persistence-provider
