@@ -14,9 +14,7 @@ import org.dom4j.Element;
 import org.apache.uima.UimaContext;
 import org.apache.uima.resource.ResourceInitializationException;
 
-import com.aliasi.chunk.Chunk;
 import com.aliasi.chunk.Chunker;
-import com.aliasi.chunk.Chunking;
 import com.aliasi.tokenizer.EnglishStopTokenizerFactory;
 import com.aliasi.tokenizer.IndoEuropeanTokenizerFactory;
 import com.aliasi.tokenizer.LowerCaseTokenizerFactory;
@@ -30,7 +28,6 @@ import edu.cmu.lti.oaqa.cse.basephase.keyterm.AbstractKeytermExtractor;
 import edu.cmu.lti.oaqa.framework.data.Keyterm;
 import edu.cmu.lti.oaqa.openqa.test.team02.utilities.XMLParser;
 
-import org.dom4j.Document;
 import org.dom4j.DocumentException;
 
 
@@ -78,10 +75,15 @@ public class KeytermExtractor extends AbstractKeytermExtractor {
       try {
         u = new URL(s + keyterm);
         List l = x.getVariants(x.parse(u));
-        for(Object o:l){
-        String v = ((Element) o).getText();
-          keytermList.add(new Keyterm(v));
+        if(l != null){
+          l = l.subList(0, Math.min(5, l.size()));
+          for(Object o:l){
+              String v = ((Element) o).getText();
+              System.out.println(v);
+              keytermList.add(new Keyterm(v));
+            }
         }
+
       } catch (MalformedURLException e) {
         // TODO Auto-generated catch block
         e.printStackTrace();

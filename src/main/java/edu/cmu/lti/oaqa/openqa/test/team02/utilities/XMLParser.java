@@ -31,10 +31,14 @@ public class XMLParser {
     Element root = document.getRootElement();
     List l = document.selectNodes("table/entries/entry/diseases/disease/variants/variant/variant_name");
     List l2 = document.selectNodes("table/entries/entry/diseases/variants/variant/variant_name");
-    if(l2 != null ){
-      l.addAll(l2);
+    if( l != null){
+      if(l2 != null ){
+        l.addAll(l2);
+      }
+      return l;
     }
-    return l;
+    else 
+      return null;
     /*
     for(Object o:l){
       System.out.println(((Element) o).getText());
