@@ -41,14 +41,20 @@ public class KeytermExtractor extends AbstractKeytermExtractor {
 
   @Override
   protected List<Keyterm> getKeyterms(String question) {
-    List<Keyterm> keytermList = new ArrayList<Keyterm>();
+    question = question.replace('?', ' ');
+    question = question.replace('(', ' ');
+    question = question.replace('[', ' ');
+    question = question.replace(')', ' ');
+    question = question.replace(']', ' ');
+    question = question.replace('/', ' ');
+    question = question.replace('\'', ' ');
 
-    Chunking chunking = chunker.chunk(question);
-    for (Chunk chunk : chunking.chunkSet()) {
-      String keyterm = question.substring(chunk.start(), chunk.end());
-      keytermList.add(new Keyterm(keyterm));
+    String[] questionTokens = question.split("\\s+");
+    List<Keyterm> keyterms = new ArrayList<Keyterm>();
+    for (int i = 0; i < questionTokens.length; i++) {
+      keyterms.add(new Keyterm(questionTokens[i]));
     }
 
-    return keytermList;
+    return keyterms;
   }
 }

@@ -67,7 +67,7 @@
 		<dependency>
 			<groupId>edu.cmu.lti.oaqa.openqa</groupId>
 			<artifactId>helloqa</artifactId>
-			<version>1.0.1</version>
+			<version>1.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.aliasi</groupId>
@@ -80,6 +80,11 @@
 			<groupId>edu.cmu.lti.11791.f12.hw1</groupId>
 			<artifactId>hw1-kmandavi</artifactId>
 			<version>0.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>maven</groupId>
+			<artifactId>dom4j</artifactId>
+			<version>1.7-20060614</version>
 		</dependency>
 	</dependencies>
 </project>
