@@ -14,11 +14,12 @@ pipeline:
   - inherit: jdbc.sqlite.cse.phase  
     name: keyterm-extractor
     options: |
-      - inherit: helloqa.keyterm.simple
-      - inherit: hellobioqa.team02.keyterm.yvchen-hw1
-      - inherit: hellobioqa.team02.keyterm.kmandavi-hw1
-      - inherit: hellobioqa.team02.keyterm.yucongy-hw1
-      # - inherit: hellobioqa.team02.keyterm.fxie-hw1
+      - inherit: hellobioqa.team02.keyterm.fxie-hw1
+#      - inherit: helloqa.keyterm.simple
+#      - inherit: hellobioqa.team02.keyterm.yvchen-hw1
+#      - inherit: hellobioqa.team02.keyterm.kmandavi-hw1
+#      - inherit: hellobioqa.team02.keyterm.yucongy-hw1
+      
       
   - inherit: jdbc.sqlite.cse.phase 
     name: retrieval-strategist
