@@ -1,5 +1,6 @@
 class: edu.cmu.lti.oaqa.openqa.test.team02.keyterm.FxieKeytermExtractor
-model_file: src/main/resources/model/ne-en-bio-genia.TokenShapeChunker
+ner_file: src/main/resources/model/ne-en-bio-genia.TokenShapeChunker
+pos_file: src/main/resources/model/pos-en-bio-genia.HiddenMarkovModel
 
 persistence-provider: |
   inherit: ecd.default-log-persistence-provider
