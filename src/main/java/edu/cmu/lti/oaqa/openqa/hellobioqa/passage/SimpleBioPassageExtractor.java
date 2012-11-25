@@ -23,7 +23,7 @@ public class SimpleBioPassageExtractor extends SimplePassageExtractor {
           List<RetrievalResult> documents) {
     List<PassageCandidate> result = new ArrayList<PassageCandidate>();
     for (RetrievalResult document : documents) {
-      System.out.println("RetrievalResult: " + document.toString());
+//      System.out.println("RetrievalResult: " + document.toString());
       String id = document.getDocID();
       try {
         String htmlText = wrapper.getDocText(id);
