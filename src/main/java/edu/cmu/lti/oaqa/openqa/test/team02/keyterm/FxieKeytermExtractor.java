@@ -106,32 +106,54 @@ public class FxieKeytermExtractor extends AbstractKeytermExtractor {
     
     if(!question.endsWith("?"))
       question = question.concat("?");
+    
+    // find ()
+    String nowQues = new String();
+    int preEnd = 0;
+    boolean flag = false;
+    Matcher key = Pattern.compile("\\([\\w|\\'|\\s|\\d|-]+\\)").matcher(question);
+    while(key.find()){
+      String insider = question.substring(key.start() + 1, key.end() - 1);
+      System.out.println("Extract insider: " + insider);
+      nowQues = nowQues.concat(question.substring(preEnd, key.start() - 1));
+      keytermList.add(new Keyterm(insider));
+      preEnd = key.end();
+      flag = true;
+    }
+    if(flag){
+      nowQues = nowQues.concat(question.substring(preEnd, question.length()));
+      System.out.println(nowQues);
+    }
+    else{
+      nowQues = question;
+    }
+
       
     String s1 = new String("http://words.bighugelabs.com/");
     String s2 = new String("http://swissvar.expasy.org/cgi-bin/swissvar/result?format=xml&global_textfield=");
     URL u;
     XMLParser x = new XMLParser();
     String c = null;
-    Chunking chunking = chunker.chunk(question);
+    Chunking chunking = chunker.chunk(nowQues);
     Chunk preChunk = null;
-    int flag = 0;
+    flag = false;
     for (Chunk chunk : chunking.chunkSet()) {
-      if(flag == 0){
-        tokens = question.substring(0, chunk.start()).split(" ");
+      if(!flag){
+        tokens = nowQues.substring(0, chunk.start()).split(" ");
         for(String token: tokens){
           if(token.length() > 0)
             tokenList.add(token);
         }
       }
       else{
-        tokens = question.substring(preChunk.end(), chunk.start()).split(" ");
+        tokens = nowQues.substring(preChunk.end(), chunk.start()).split(" ");
         for(String token: tokens){
           if(token.length() > 0)
             tokenList.add(token);
         }
       }
-      flag = 1;
-      String keyterm = question.substring(chunk.start(), chunk.end());
+      flag = true;
+      String keyterm = nowQues.substring(chunk.start(), chunk.end());
       tokenList.add(keyterm);
       keytermList.add(new Keyterm(keyterm));
       System.out.println("Bio Keyterm: " + keyterm + " (" + chunk.type() + ")");
@@ -177,15 +199,15 @@ public class FxieKeytermExtractor extends AbstractKeytermExtractor {
               String synonym = node.getChildren().asString();
               Chunking nowchunking = chunker.chunk(synonym);
               System.out.println("!!!Synonym!!!!!!!!!!! " + synonym);
-              keytermList.add(new Keyterm(synonym));
+              //keytermList.add(new Keyterm(synonym));
             }
          }
       }
       preChunk = chunk;
     }
-    System.out.println(question);
-    if(preChunk.end() < question.length()){
-      tokens = question.substring(preChunk.end(), question.length() - 1).split(" ");
+    System.out.println(nowQues);
+    if(preChunk.end() < nowQues.length() - 1){
+      tokens = nowQues.substring(preChunk.end(), nowQues.length() - 1).split(" ");
       for(String token: tokens){
         if(token.length() > 0)
           tokenList.add(token);
@@ -202,37 +224,7 @@ public class FxieKeytermExtractor extends AbstractKeytermExtractor {
       nowTag = genTagging.tag(i);
       if((nowTag.startsWith("VB") && !preTag.startsWith("W")) || (nowTag.startsWith("NN"))){
         System.out.print("[" + genTagging.token(i) + "_" + nowTag + "] ");
-        keytermList.add(new Keyterm(genTagging.token(i)));
-      }
-      else
-        System.out.print(genTagging.token(i) + "_" + nowTag + " ");
-      preTag = nowTag;
-    }
-    System.out.println("");
-    for (int i = 0; i < medTagging.size(); i ++){
-      nowTag = medTagging.tag(i);
-      if(nowTag.startsWith("VV") || (nowTag.startsWith("NN"))){
-        System.out.print("[" + medTagging.token(i) + "_" + nowTag + "] ");
-        keytermList.add(new Keyterm(medTagging.token(i)));
-      }
-      else
-        System.out.print(medTagging.token(i) + "_" + nowTag + " ");
-      preTag = nowTag;
-    }
-    System.out.println("");
-    // original word sequence
-    TokenizerFactory f0 = new RegExTokenizerFactory("(-|'|\\d|\\p{L})+|\\S");  
-    nowTokenizer = f0.tokenizer(question.toCharArray(), 0, question.length());
-    tokens = nowTokenizer.tokenize();
-    genTagging = genDecoder.tag(Arrays.asList(tokens));
-    medTagging = medDecoder.tag(Arrays.asList(tokens));
-    System.out.println("=============== Ori POS ====================");
-    preTag = null;
-    for (int i = 0; i < genTagging.size(); i ++){
-      nowTag = genTagging.tag(i);
-      if((nowTag.startsWith("VB") && !preTag.startsWith("W")) || (nowTag.startsWith("NN"))){
-        System.out.print("[" + genTagging.token(i) + "_" + nowTag + "] ");
-        keytermList.add(new Keyterm(genTagging.token(i)));
+        //keytermList.add(new Keyterm(genTagging.token(i)));
       }
       else
         System.out.print(genTagging.token(i) + "_" + nowTag + " ");
@@ -244,6 +236,36 @@ public class FxieKeytermExtractor extends AbstractKeytermExtractor {
       if(nowTag.startsWith("VV") || (nowTag.startsWith("NN"))){
         System.out.print("[" + medTagging.token(i) + "_" + nowTag + "] ");
         //keytermList.add(new Keyterm(medTagging.token(i)));
+      }
+      else
+        System.out.print(medTagging.token(i) + "_" + nowTag + " ");
+      preTag = nowTag;
+    }
+    System.out.println("");
+    // original word sequence
+    TokenizerFactory f0 = new RegExTokenizerFactory("(-|'|\\d|\\p{L})+|\\S");  
+    nowTokenizer = f0.tokenizer(nowQues.toCharArray(), 0, nowQues.length());
+    tokens = nowTokenizer.tokenize();
+    genTagging = genDecoder.tag(Arrays.asList(tokens));
+    medTagging = medDecoder.tag(Arrays.asList(tokens));
+    System.out.println("=============== Ori POS ====================");
+    preTag = null;
+    for (int i = 0; i < genTagging.size(); i ++){
+      nowTag = genTagging.tag(i);
+      if((nowTag.startsWith("VB") && !preTag.startsWith("W")) || (nowTag.startsWith("NN"))){
+        System.out.print("[" + genTagging.token(i) + "_" + nowTag + "] ");
+        //keytermList.add(new Keyterm(genTagging.token(i)));
+      }
+      else
+        System.out.print(genTagging.token(i) + "_" + nowTag + " ");
+      preTag = nowTag;
+    }
+    System.out.println("");
+    for (int i = 0; i < medTagging.size(); i ++){
+      nowTag = medTagging.tag(i);
+      if(nowTag.startsWith("VV") || (nowTag.startsWith("NN"))){
+        System.out.print("[" + medTagging.token(i) + "_" + nowTag + "] ");
+        keytermList.add(new Keyterm(medTagging.token(i)));
       }
       else
         System.out.print(medTagging.token(i) + "_" + nowTag + " ");
