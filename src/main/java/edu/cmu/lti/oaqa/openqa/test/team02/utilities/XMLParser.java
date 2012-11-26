@@ -7,6 +7,7 @@ import java.util.List;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
+import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 
 
@@ -27,18 +28,35 @@ public class XMLParser {
     return document;
   }
   
-  public static List getVariants(Document document) throws DocumentException{
-    Element root = document.getRootElement();
-    List l = document.selectNodes("table/entries/entry/diseases/disease/variants/variant/variant_name");
-    List l2 = document.selectNodes("table/entries/entry/diseases/variants/variant/variant_name");
-    if( l != null){
-      if(l2 != null ){
-        l.addAll(l2);
+  public static List<Node> getVariants(Document document) throws DocumentException{
+    try{
+      List<Node> l = (List<Node>) document.selectNodes("table/entries/entry/diseases/disease/variants/variant/variant_name");
+      //System.out.println(l);
+      try{
+        List<Node> l2 = (List<Node>) document.selectNodes("table/entries/entry/diseases/variants/variant/variant_name");
+        
+        if( l != null &&  l.size() > 0 ){
+          if(l2 != null ){
+            l.addAll(l2);
+          }
+          return l;
+        }
+        else 
+          return l2;
       }
-      return l;
+      catch(Exception e){
+        if( l != null &&  l.size() > 0 ){
+          return null;
+        }
+        else 
+          return null;
+      }
+      
     }
-    else 
+    catch(Exception e){
       return null;
+    }
+    
     /*
     for(Object o:l){
       System.out.println(((Element) o).getText());

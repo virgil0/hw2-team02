@@ -15,6 +15,7 @@ import edu.cmu.lti.oaqa.framework.data.RetrievalResult;
 import edu.cmu.lti.oaqa.openqa.hello.passage.KeytermWindowScorerSum;
 import edu.cmu.lti.oaqa.openqa.hello.passage.PassageCandidateFinder;
 import edu.cmu.lti.oaqa.openqa.hello.passage.SimplePassageExtractor;
+import edu.cmu.lti.oaqa.openqa.test.team02.passage.SimplePassageCandidateFinder;
 
 public class SimpleBioPassageExtractor extends SimplePassageExtractor {
 
@@ -30,19 +31,22 @@ public class SimpleBioPassageExtractor extends SimplePassageExtractor {
 
         // cleaning HTML text
         String text = Jsoup.parse(htmlText).text().replaceAll("([\177-\377\0-\32]*)", "")/* .trim() */;
+        //String text = htmlText;
         // for now, making sure the text isn't too long
-        text = text.substring(0, Math.min(5000, text.length()));
-        System.out.println(text);
+        //text = text.substring(0, Math.min(5000, text.length()));
+        System.out.println("text:" + text);
 
-        PassageCandidateFinder finder = new PassageCandidateFinder(id, text, new KeytermWindowScorerSum());
+        SimplePassageCandidateFinder finder = new SimplePassageCandidateFinder(id, text, new KeytermWindowScorerSum());
         List<String> keytermStrings = Lists.transform(keyterms, new Function<Keyterm, String>() {
           public String apply(Keyterm keyterm) {
             return keyterm.getText();
           }
         });
         List<PassageCandidate> passageSpans = finder.extractPassages(keytermStrings.toArray(new String[0]));
-        for (PassageCandidate passageSpan : passageSpans)
+        for (PassageCandidate passageSpan : passageSpans){
+          //System.out.print(passageSpan.getRank());
           result.add(passageSpan);
+        }
       } catch (SolrServerException e) {
         e.printStackTrace();
       }
