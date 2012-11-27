@@ -40,14 +40,13 @@ import com.aliasi.util.AbstractExternalizable;
 
 import edu.cmu.lti.oaqa.cse.basephase.keyterm.AbstractKeytermExtractor;
 import edu.cmu.lti.oaqa.framework.data.Keyterm;
-import edu.cmu.lti.oaqa.openqa.test.team02.utilities.XMLParser;
 
 /**
  *
- * @author Fei Xie
+ * @author Team02
  */
 
-public class FxieKeytermExtractor extends AbstractKeytermExtractor {
+public class KeytermExtractor extends AbstractKeytermExtractor {
 
   public static final String PARAM_NERMODELFILE = "ner_file";
   public static final String PARAM_POSGENMODELFILE = "posgen_file";
@@ -129,11 +128,11 @@ public class FxieKeytermExtractor extends AbstractKeytermExtractor {
     }
 
       
-    String s1 = new String("http://words.bighugelabs.com/");
+    /*String s1 = new String("http://words.bighugelabs.com/");
     String s2 = new String("http://swissvar.expasy.org/cgi-bin/swissvar/result?format=xml&global_textfield=");
     URL u;
     XMLParser x = new XMLParser();
-    String c = null;
+    String c = null;*/
     Chunking chunking = chunker.chunk(nowQues);
     Chunk preChunk = null;
     flag = false;
@@ -158,27 +157,14 @@ public class FxieKeytermExtractor extends AbstractKeytermExtractor {
       keytermList.add(new Keyterm(keyterm));
       System.out.println("Bio Keyterm: " + keyterm + " (" + chunk.type() + ")");
       
-      Matcher m = Pattern.compile("[A-Z0-9]+").matcher(keyterm);
+/*      Matcher m = Pattern.compile("[A-Z0-9]+").matcher(keyterm);
       if (m.matches() == false){
         System.out.println("*****Find Synonym**********" + keyterm);
         try {
           c = getWebCon(s1 + keyterm).toString();
-          /*u = new URL(s2 + keyterm);
-          List l = x.getVariants(x.parse(u));
-          if(l != null){
-            l = l.subList(0, Math.min(5, l.size()));
-            for(Object o:l){
-                //String v = ((Element) o).getText();
-              System.out.println("!!!Synonym!!!!!!!!!!! " + o.toString());
-              keytermList.add(new Keyterm(o.toString()));
-            }
-          }*/
         } catch (IOException e) {
           e.printStackTrace();
-        } /*catch (DocumentException e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        }*/
+        }
         Parser parser = Parser.createParser(c, "GBK");         
         HtmlPage page = new HtmlPage(parser);                              
         TagNameFilter filter=  new TagNameFilter("li");
@@ -202,7 +188,7 @@ public class FxieKeytermExtractor extends AbstractKeytermExtractor {
               //keytermList.add(new Keyterm(synonym));
             }
          }
-      }
+      }*/
       preChunk = chunk;
     }
     System.out.println(nowQues);
@@ -214,6 +200,50 @@ public class FxieKeytermExtractor extends AbstractKeytermExtractor {
       }
     }
     tokenList.add("?");
+    
+    // find synonym
+    String s1 = new String("http://words.bighugelabs.com/");
+    String c = null;
+    List<String> synonymList = new ArrayList<String>();
+    for(Keyterm hitkey : keytermList){
+      String keyterm = hitkey.toString();
+      System.out.println("~~~~" + keyterm);
+      Matcher m = Pattern.compile("[A-Z0-9]+").matcher(keyterm);
+      if (m.matches() == false){
+        System.out.println("*****Find Synonym**********" + keyterm);
+        try {
+          c = getWebCon(s1 + keyterm).toString();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+        Parser parser = Parser.createParser(c, "GBK");         
+        HtmlPage page = new HtmlPage(parser);                              
+        TagNameFilter filter=  new TagNameFilter("li");
+        org.htmlparser.Node node = null;  
+        NodeList nodeList = null;
+        try {
+          nodeList = parser.extractAllNodesThatMatch(filter);
+        } catch (ParserException e) {
+          e.printStackTrace();
+        }
+        int limit = nodeList.size();
+        if(nodeList.size() > 5)
+          limit = 5;
+        for (int i = 0; i < limit; ++i){  
+          node = nodeList.elementAt(i);
+          if(node.getParent().getPreviousSibling().getChildren().asString().equals("noun")){
+            String synonym = node.getChildren().asString();
+            //Chunking nowchunking = chunker.chunk(synonym);
+            System.out.println("!!!Synonym!!!!!!!!!!! " + synonym);
+            synonymList.add(synonym);
+          }
+        }
+      }
+    } 
+    /*for(String syn : synonymList){
+      keytermList.add(new Keyterm(syn));
+    }*/
+    
     // pos tagging
     Tokenizer nowTokenizer;
     Tagging<String> genTagging = genDecoder.tag(tokenList);
