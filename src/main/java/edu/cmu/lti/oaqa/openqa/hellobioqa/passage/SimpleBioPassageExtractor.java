@@ -23,7 +23,7 @@ public class SimpleBioPassageExtractor extends SimplePassageExtractor {
           List<RetrievalResult> documents) {
     List<PassageCandidate> result = new ArrayList<PassageCandidate>();
     for (RetrievalResult document : documents) {
-      System.out.println("RetrievalResult: " + document.toString());
+//      System.out.println("RetrievalResult: " + document.toString());
       String id = document.getDocID();
       try {
         String htmlText = wrapper.getDocText(id);
@@ -34,15 +34,13 @@ public class SimpleBioPassageExtractor extends SimplePassageExtractor {
         text = text.substring(0, Math.min(5000, text.length()));
         System.out.println(text);
 
-        PassageCandidateFinder finder = new PassageCandidateFinder(id, text,
-                new KeytermWindowScorerSum());
+        PassageCandidateFinder finder = new PassageCandidateFinder(id, text, new KeytermWindowScorerSum());
         List<String> keytermStrings = Lists.transform(keyterms, new Function<Keyterm, String>() {
           public String apply(Keyterm keyterm) {
             return keyterm.getText();
           }
         });
-        List<PassageCandidate> passageSpans = finder.extractPassages(keytermStrings
-                .toArray(new String[0]));
+        List<PassageCandidate> passageSpans = finder.extractPassages(keytermStrings.toArray(new String[0]));
         for (PassageCandidate passageSpan : passageSpans)
           result.add(passageSpan);
       } catch (SolrServerException e) {
