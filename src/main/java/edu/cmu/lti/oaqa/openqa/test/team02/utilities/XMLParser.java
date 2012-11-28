@@ -56,7 +56,7 @@ public class XMLParser {
     catch(Exception e){
       return null;
     }
-    
+
     /*
     for(Object o:l){
       System.out.println(((Element) o).getText());
