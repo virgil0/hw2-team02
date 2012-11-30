@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +19,7 @@ import java.util.regex.Pattern;
 import org.apache.uima.UimaContext;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.dom4j.DocumentException;
+import org.dom4j.Node;
 import org.htmlparser.Parser;
 import org.htmlparser.filters.TagNameFilter;
 import org.htmlparser.util.NodeList;
@@ -102,7 +104,8 @@ public class YvchenKeytermExtractor extends AbstractKeytermExtractor {
     
     List<Keyterm> keytermList = new ArrayList<Keyterm>();
     String[] tokens = null;
-    List<String> tokenList = new ArrayList<String>();    
+    List<String> tokenList = new ArrayList<String>();
+    List<String> verbList = new ArrayList<String>();
     
     if(!question.endsWith("?"))
       question = question.concat("?");
@@ -127,13 +130,7 @@ public class YvchenKeytermExtractor extends AbstractKeytermExtractor {
     else{
       nowQues = question;
     }
-
       
-    /*String s1 = new String("http://words.bighugelabs.com/");
-    String s2 = new String("http://swissvar.expasy.org/cgi-bin/swissvar/result?format=xml&global_textfield=");
-    URL u;
-    XMLParser x = new XMLParser();
-    String c = null;*/
     Chunking chunking = chunker.chunk(nowQues);
     Chunk preChunk = null;
     flag = false;
@@ -156,40 +153,7 @@ public class YvchenKeytermExtractor extends AbstractKeytermExtractor {
       String keyterm = nowQues.substring(chunk.start(), chunk.end());
       tokenList.add(keyterm);
       keytermList.add(new Keyterm(keyterm));
-      System.out.println("Bio Keyterm: " + keyterm + " (" + chunk.type() + ")");
-      
-/*      Matcher m = Pattern.compile("[A-Z0-9]+").matcher(keyterm);
-      if (m.matches() == false){
-        System.out.println("*****Find Synonym**********" + keyterm);
-        try {
-          c = getWebCon(s1 + keyterm).toString();
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-        Parser parser = Parser.createParser(c, "GBK");         
-        HtmlPage page = new HtmlPage(parser);                              
-        TagNameFilter filter=  new TagNameFilter("li");
-        org.htmlparser.Node node = null;  
-        NodeList nodeList = null;
-        try {
-          nodeList = parser.extractAllNodesThatMatch(filter);
-        } catch (ParserException e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        }
-        int limit = nodeList.size();
-        if(nodeList.size() > 5)
-          limit = 5;
-        for (int i = 0; i < limit; ++i){  
-            node = nodeList.elementAt(i);
-            if(node.getParent().getPreviousSibling().getChildren().asString().equals("noun")){
-              String synonym = node.getChildren().asString();
-              Chunking nowchunking = chunker.chunk(synonym);
-              System.out.println("!!!Synonym!!!!!!!!!!! " + synonym);
-              //keytermList.add(new Keyterm(synonym));
-            }
-         }
-      }*/
+      System.out.println("Bio Keyterm: " + keyterm + " (" + chunk.type() + ")");      
       preChunk = chunk;
     }
     System.out.println(nowQues);
@@ -203,9 +167,36 @@ public class YvchenKeytermExtractor extends AbstractKeytermExtractor {
     tokenList.add("?");
     
     // find synonym
-    String s1 = new String("http://words.bighugelabs.com/");
+    String s1 = new String("http://words.bighugelabs.com/");    
+    String s2 = new String("http://swissvar.expasy.org/cgi-bin/swissvar/result?format=xml&global_textfield=");
+    URL u;
+    XMLParser x = new XMLParser();
+    List<String> tempList = new ArrayList<String>();
+    for (Keyterm k : keytermList) {
+      String keyterm = k.getText();
+      try {
+        u = new URL(s2 + keyterm);       
+        List<Node> l = x.getVariants(x.parse(u));
+        if(l != null){
+          l = l.subList(0, Math.min(2, l.size()));
+          for(Node o:l){
+              String v = o.getText();
+              //System.out.println(v);
+              tempList.add(v.substring(2, v.length()));
+            }
+        }
+      } catch (MalformedURLException e) {
+        // TODO Auto-generated catch block
+        //e.printStackTrace();
+      } catch (DocumentException e) {
+        // TODO Auto-generated catch block
+        //e.printStackTrace();
+      }
+    }
+    
     String c = null;
     List<String> synonymList = new ArrayList<String>();
+    
     for(Keyterm hitkey : keytermList){
       String keyterm = hitkey.toString();
       System.out.println("~~~~" + keyterm);
@@ -236,15 +227,11 @@ public class YvchenKeytermExtractor extends AbstractKeytermExtractor {
             String synonym = node.getChildren().asString();
             //Chunking nowchunking = chunker.chunk(synonym);
             System.out.println("!!!Synonym!!!!!!!!!!! " + synonym);
-            synonymList.add(synonym);
+            //synonymList.add(synonym);
           }
         }
       }
-    } 
-    /*for(String syn : synonymList){
-      keytermList.add(new Keyterm(syn));
-    }*/
-    
+    }
     // pos tagging
     Tokenizer nowTokenizer;
     Tagging<String> genTagging = genDecoder.tag(tokenList);
@@ -294,7 +281,12 @@ public class YvchenKeytermExtractor extends AbstractKeytermExtractor {
     System.out.println("");
     for (int i = 0; i < medTagging.size(); i ++){
       nowTag = medTagging.tag(i);
-      if(nowTag.startsWith("VV") || (nowTag.startsWith("NN"))){
+      if(nowTag.startsWith("VV")){
+        System.out.print("[" + medTagging.token(i) + "_" + nowTag + "] ");
+        //keytermList.add(new Keyterm(medTagging.token(i)));
+        verbList.add(medTagging.token(i));
+      }
+      else if(nowTag.startsWith("NN")){
         System.out.print("[" + medTagging.token(i) + "_" + nowTag + "] ");
         keytermList.add(new Keyterm(medTagging.token(i)));
       }
@@ -302,7 +294,46 @@ public class YvchenKeytermExtractor extends AbstractKeytermExtractor {
         System.out.print(medTagging.token(i) + "_" + nowTag + " ");
       preTag = nowTag;
     }
-    System.out.println("");
+    System.out.println("");    
+    
+    for(String verb : verbList){
+      synonymList.add(verb);
+      System.out.println("*****Find Synonym**********" + verb);
+      try {
+        c = getWebCon(s1 + verb).toString();
+      } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+      Parser parser = Parser.createParser(c, "GBK");
+      HtmlPage page = new HtmlPage(parser);                        
+      TagNameFilter filter=  new TagNameFilter("li");
+      org.htmlparser.Node node = null;
+      NodeList nodeList = null;
+      try {
+        nodeList = parser.extractAllNodesThatMatch(filter);
+      } catch (ParserException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+      int limit = nodeList.size();
+      if(nodeList.size() > 5)
+        limit = 5;
+      for (int i = 0; i < limit; ++i){
+        node = nodeList.elementAt(i);
+        if(node.getParent().getPreviousSibling().getChildren().asString().equals("verb")){
+          String synonym = node.getChildren().asString();
+          System.out.println("!!!Synonym!!!!!!!!!!! " + synonym);
+          synonymList.add(synonym);
+        }
+      }
+    }
+    for(String syn : synonymList){
+      keytermList.add(new Keyterm(syn));
+    }
+    for(String tmp : tempList){
+      keytermList.add(new Keyterm(tmp));
+    }
     return keytermList;
   }
 }
