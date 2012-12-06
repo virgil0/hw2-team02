@@ -128,7 +128,7 @@ public class KeytermExtractor extends AbstractKeytermExtractor {
     Matcher key = Pattern.compile("\\([\\w|\\'|\\s|\\d|-]+\\)").matcher(question);
     while(key.find()){
       String insider = question.substring(key.start() + 1, key.end() - 1);
-      System.out.println("Extract insider: " + insider);
+      //System.out.println("Extract insider: " + insider);
       nowQues = nowQues.concat(question.substring(preEnd, key.start() - 1));
       keytermList.add(new Keyterm(insider));
       preEnd = key.end();
@@ -136,7 +136,7 @@ public class KeytermExtractor extends AbstractKeytermExtractor {
     }
     if(flag){
       nowQues = nowQues.concat(question.substring(preEnd, question.length()));
-      System.out.println(nowQues);
+      //System.out.println(nowQues);
     }
     else{
       nowQues = question;
@@ -163,11 +163,11 @@ public class KeytermExtractor extends AbstractKeytermExtractor {
       flag = true;
       String keyterm = nowQues.substring(chunk.start(), chunk.end());
       tokenList.add(keyterm);
-      keytermList.add(new Keyterm(keyterm));
+      keytermList.add(new Keyterm(keyterm.toUpperCase()));
       System.out.println("Bio Keyterm: " + keyterm + " (" + chunk.type() + ")");      
       preChunk = chunk;
     }
-    System.out.println(nowQues);
+    //System.out.println(nowQues);
     if(preChunk.end() < nowQues.length() - 1){
       tokens = nowQues.substring(preChunk.end(), nowQues.length() - 1).split(" ");
       for(String token: tokens){
@@ -212,10 +212,10 @@ public class KeytermExtractor extends AbstractKeytermExtractor {
     
     for(Keyterm hitkey : keytermList){
       String keyterm = hitkey.toString();
-      System.out.println("~~~~" + keyterm);
+      //System.out.println("~~~~" + keyterm);
       Matcher m = Pattern.compile("[A-Z0-9]+").matcher(keyterm);
       if (m.matches() == false){
-        System.out.println("*****Find Synonym**********" + keyterm);
+        //System.out.println("*****Find Synonym**********" + keyterm);
         try {
           c = getWebCon(s1 + keyterm).toString();
         } catch (IOException e) {
@@ -239,7 +239,7 @@ public class KeytermExtractor extends AbstractKeytermExtractor {
           if(node.getParent().getPreviousSibling().getChildren().asString().equals("noun")){
             String synonym = node.getChildren().asString();
             //Chunking nowchunking = chunker.chunk(synonym);
-            System.out.println("!!!Synonym!!!!!!!!!!! " + synonym);
+            //System.out.println("!!!Synonym!!!!!!!!!!! " + synonym);
             //synonymList.add(synonym);
           }
         }
@@ -249,7 +249,7 @@ public class KeytermExtractor extends AbstractKeytermExtractor {
     Tokenizer nowTokenizer;
     Tagging<String> genTagging = genDecoder.tag(tokenList);
     Tagging<String> medTagging = medDecoder.tag(tokenList);
-    System.out.println("=============== POS ====================");
+    //System.out.println("=============== POS ====================");
     String nowTag, preTag = null;
     for (int i = 0; i < genTagging.size(); i ++){
       nowTag = genTagging.tag(i);
@@ -258,60 +258,60 @@ public class KeytermExtractor extends AbstractKeytermExtractor {
         //keytermList.add(new Keyterm(genTagging.token(i)));
       }
       else
-        System.out.print(genTagging.token(i) + "_" + nowTag + " ");
+        //System.out.print(genTagging.token(i) + "_" + nowTag + " ");
       preTag = nowTag;
     }
     System.out.println("");
     for (int i = 0; i < medTagging.size(); i ++){
       nowTag = medTagging.tag(i);
       if(nowTag.startsWith("VV") || (nowTag.startsWith("NN"))){
-        System.out.print("[" + medTagging.token(i) + "_" + nowTag + "] ");
+        //System.out.print("[" + medTagging.token(i) + "_" + nowTag + "] ");
         //keytermList.add(new Keyterm(medTagging.token(i)));
       }
       else
-        System.out.print(medTagging.token(i) + "_" + nowTag + " ");
+        //System.out.print(medTagging.token(i) + "_" + nowTag + " ");
       preTag = nowTag;
     }
-    System.out.println("");
+    //System.out.println("");
     // original word sequence
     TokenizerFactory f0 = new RegExTokenizerFactory("(-|'|\\d|\\p{L})+|\\S");  
     nowTokenizer = f0.tokenizer(nowQues.toCharArray(), 0, nowQues.length());
     tokens = nowTokenizer.tokenize();
     genTagging = genDecoder.tag(Arrays.asList(tokens));
     medTagging = medDecoder.tag(Arrays.asList(tokens));
-    System.out.println("=============== Ori POS ====================");
+    //System.out.println("=============== Ori POS ====================");
     preTag = null;
     for (int i = 0; i < genTagging.size(); i ++){
       nowTag = genTagging.tag(i);
       if((nowTag.startsWith("VB") && !preTag.startsWith("W")) || (nowTag.startsWith("NN"))){
-        System.out.print("[" + genTagging.token(i) + "_" + nowTag + "] ");
+        //System.out.print("[" + genTagging.token(i) + "_" + nowTag + "] ");
         //keytermList.add(new Keyterm(genTagging.token(i)));
       }
       else
-        System.out.print(genTagging.token(i) + "_" + nowTag + " ");
+        //System.out.print(genTagging.token(i) + "_" + nowTag + " ");
       preTag = nowTag;
     }
-    System.out.println("");
+    //System.out.println("");
     for (int i = 0; i < medTagging.size(); i ++){
       nowTag = medTagging.tag(i);
       if(nowTag.startsWith("VV")){
-        System.out.print("[" + medTagging.token(i) + "_" + nowTag + "] ");
+        //System.out.print("[" + medTagging.token(i) + "_" + nowTag + "] ");
         //keytermList.add(new Keyterm(medTagging.token(i)));
         verbList.add(medTagging.token(i));
       }
       else if(nowTag.startsWith("NN")){
-        System.out.print("[" + medTagging.token(i) + "_" + nowTag + "] ");
+        //System.out.print("[" + medTagging.token(i) + "_" + nowTag + "] ");
         keytermList.add(new Keyterm(medTagging.token(i)));
       }
       else
-        System.out.print(medTagging.token(i) + "_" + nowTag + " ");
+        //System.out.print(medTagging.token(i) + "_" + nowTag + " ");
       preTag = nowTag;
     }
-    System.out.println("");    
+    //System.out.println("");    
     
     for(String verb : verbList){
       synonymList.add(verb);
-      System.out.println("*****Find Synonym**********" + verb);
+      //System.out.println("*****Find Synonym**********" + verb);
       try {
         c = getWebCon(s1 + verb).toString();
       } catch (IOException e) {
@@ -336,7 +336,7 @@ public class KeytermExtractor extends AbstractKeytermExtractor {
         node = nodeList.elementAt(i);
         if(node.getParent().getPreviousSibling().getChildren().asString().equals("verb")){
           String synonym = node.getChildren().asString();
-          System.out.println("!!!Synonym!!!!!!!!!!! " + synonym);
+          //System.out.println("!!!Synonym!!!!!!!!!!! " + synonym);
           synonymList.add(synonym);
         }
       }
