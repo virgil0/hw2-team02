@@ -1,10 +1,14 @@
 package edu.cmu.lti.oaqa.openqa.test.team02.passage;
 
 
+import java.text.BreakIterator;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.jsoup.Jsoup;
 
 import com.google.common.base.Function;
@@ -18,7 +22,21 @@ import edu.cmu.lti.oaqa.openqa.hello.passage.PassageCandidateFinder;
 import edu.cmu.lti.oaqa.openqa.hello.passage.SimplePassageExtractor;
 
 public class PassageExtractor extends SimplePassageExtractor {
-
+  
+  private void mapAdd(Map map_t, String word)
+  {             
+       
+    if(map_t.containsKey(word))
+    {
+      int v = (Integer) map_t.get(word);
+      v++;
+      map_t.put(word, v);
+    }
+    else
+    {
+      map_t.put(word, 1);
+    }
+  }
   @Override
   protected List<PassageCandidate> extractPassages(String question, List<Keyterm> keyterms,
           List<RetrievalResult> documents) {
@@ -43,9 +61,44 @@ public class PassageExtractor extends SimplePassageExtractor {
           }
         });
         List<PassageCandidate> passageSpans = finder.extractPassages(keytermStrings.toArray(new String[0]));
-        for (PassageCandidate passageSpan : passageSpans)
-          result.add(passageSpan);
+        
+        for(int i = 0; i < passageSpans.size(); i++)
+        {
+             double passageScore = 0;
+             BreakIterator sepWord = BreakIterator.getWordInstance();
+             String theText = text.substring(passageSpans.get(i).getStart(), passageSpans.get(i).getEnd());
+             sepWord.setText(theText);
+             int begin = sepWord.first();
+             Map<String, Integer> map = new HashMap<String, Integer>();
+             for (int end = sepWord.next(); end != BreakIterator.DONE; begin = end, end = sepWord.next()) {
+                  String mm = theText.substring(begin,end);
+                   mapAdd(map, mm);
+             }
+             for(int j = 0; j < keyterms.size(); j++)
+             {
+                 if(map.containsKey(keyterms.get(j).toString()))
+                 {
+                   int keytermCount = map.get(keyterms.get(j).toString());
+                   if(keytermCount > 0)
+                   {
+                        double temp = (double)keytermCount / theText.length();
+                        passageScore +=temp;
+                   }
+                   else
+                   {
+                      //   passageScore += 0.5 / theText.length();
+                   }
+                 }
+             }
+             PassageCandidate senWithScore = new PassageCandidate( id ,passageSpans.get(i).getStart(), passageSpans.get(i).getEnd(),
+                      (float) (passageScore) , null );
+        
+          result.add(senWithScore);
+        }
       } catch (SolrServerException e) {
+        e.printStackTrace();
+      } catch (AnalysisEngineProcessException e) {
+        // TODO Auto-generated catch block
         e.printStackTrace();
       }
     }
