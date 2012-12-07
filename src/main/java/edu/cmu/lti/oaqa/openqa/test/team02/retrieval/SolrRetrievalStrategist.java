@@ -55,8 +55,8 @@ public class SolrRetrievalStrategist extends AbstractRetrievalStrategist {
   protected String formulateQuery(List<Keyterm> keyterms) {
     StringBuffer result = new StringBuffer();
     for (Keyterm keyterm : keyterms) {
-      if(Character.isUpperCase(keyterm.getText().charAt(1)))
-          result.append("(\"" + keyterm.getText() + "\")^2 ");
+      if(Character.isUpperCase(keyterm.getText().charAt(0)))
+          result.append("(\"" + keyterm.getText().toLowerCase() + "\")^2 ");
       else
         result.append("\"" + keyterm.getText() + "\" ");
 
