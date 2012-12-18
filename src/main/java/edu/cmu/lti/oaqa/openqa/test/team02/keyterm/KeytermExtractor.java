@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.net.MalformedURLException;
@@ -92,17 +93,41 @@ public class KeytermExtractor extends AbstractKeytermExtractor {
    */
   public void initialize(UimaContext c) throws ResourceInitializationException {
     super.initialize(c);
-    File NERmodelFile = new File(((String) c.getConfigParameterValue(PARAM_NERMODELFILE)).trim());
-    File POSgenmodelFile = new File(((String) c.getConfigParameterValue(PARAM_POSGENMODELFILE)).trim());
-    File POSmedmodelFile = new File(((String) c.getConfigParameterValue(PARAM_POSMEDMODELFILE)).trim());
-    if (!NERmodelFile.exists() || !POSgenmodelFile.exists() || !POSmedmodelFile.exists()) {
+    
+    URL url_1 = this.getClass().getResource("/model/ne-en-bio-genia.TokenShapeChunker");
+    URL url_2 = this.getClass().getResource("/model/pos-en-bio-genia.HiddenMarkovModel");
+    URL url_3 = this.getClass().getResource("/model/pos-en-bio-medpost.HiddenMarkovModel");
+    //File NERmodelFile = new File("model/ne-en-bio-genia.TokenShapeChunker");
+    //File POSgenmodelFile = new File("model/pos-en-bio-genia.HiddenMarkovModel");
+    //File POSmedmodelFile = new File("model/pos-en-bio-medpost.HiddenMarkovModel");
+    /*if (!NERmodelFile.exists() || !POSgenmodelFile.exists() || !POSmedmodelFile.exists()) {
       throw new ResourceInitializationException();
-    }
-
+    }*/
+    ObjectInputStream ois_1 = null;
     try {
-      genDecoder = new HmmDecoder((HiddenMarkovModel) AbstractExternalizable.readObject(POSgenmodelFile));
-      medDecoder = new HmmDecoder((HiddenMarkovModel) AbstractExternalizable.readObject(POSmedmodelFile));
-      chunker = (Chunker) AbstractExternalizable.readObject(NERmodelFile);
+      ois_1 = new ObjectInputStream(url_1.openStream());
+    } catch (IOException e1) {
+      // TODO Auto-generated catch block
+      e1.printStackTrace();
+    }
+    ObjectInputStream ois_2 = null;
+    try {
+      ois_2 = new ObjectInputStream(url_2.openStream());
+    } catch (IOException e1) {
+      // TODO Auto-generated catch block
+      e1.printStackTrace();
+    }
+    ObjectInputStream ois_3 = null;
+    try {
+      ois_3 = new ObjectInputStream(url_3.openStream());
+    } catch (IOException e1) {
+      // TODO Auto-generated catch block
+      e1.printStackTrace();
+    }
+    try {
+      genDecoder = new HmmDecoder((HiddenMarkovModel) ois_2.readObject());
+      medDecoder = new HmmDecoder((HiddenMarkovModel) ois_3.readObject());
+      chunker = (Chunker) ois_1.readObject();
     } catch (IOException e) {
       throw new ResourceInitializationException(e);
     } catch (ClassNotFoundException e) {
