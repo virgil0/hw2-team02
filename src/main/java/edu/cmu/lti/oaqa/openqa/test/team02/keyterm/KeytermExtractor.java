@@ -2,11 +2,8 @@ package edu.cmu.lti.oaqa.openqa.test.team02.keyterm;
 
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.net.MalformedURLException;
@@ -33,14 +30,9 @@ import com.aliasi.chunk.Chunking;
 import com.aliasi.hmm.HiddenMarkovModel;
 import com.aliasi.hmm.HmmDecoder;
 import com.aliasi.tag.Tagging;
-import com.aliasi.tokenizer.EnglishStopTokenizerFactory;
-import com.aliasi.tokenizer.IndoEuropeanTokenizerFactory;
-import com.aliasi.tokenizer.RegExFilteredTokenizerFactory;
 import com.aliasi.tokenizer.RegExTokenizerFactory;
 import com.aliasi.tokenizer.Tokenizer;
 import com.aliasi.tokenizer.TokenizerFactory;
-import com.aliasi.util.AbstractExternalizable;
-
 import edu.cmu.lti.oaqa.cse.basephase.keyterm.AbstractKeytermExtractor;
 import edu.cmu.lti.oaqa.framework.data.Keyterm;
 import edu.cmu.lti.oaqa.openqa.test.team02.utilities.XMLParser;
