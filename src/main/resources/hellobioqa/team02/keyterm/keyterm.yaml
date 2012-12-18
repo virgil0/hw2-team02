@@ -1,5 +1,4 @@
 class: edu.cmu.lti.oaqa.openqa.test.team02.keyterm.KeytermExtractor
-model_file: model/ne-en-bio-genetag.HmmChunker
 ner_file: model/ne-en-bio-genia.TokenShapeChunker
 posgen_file: model/pos-en-bio-genia.HiddenMarkovModel
 posmed_file: model/pos-en-bio-medpost.HiddenMarkovModel
